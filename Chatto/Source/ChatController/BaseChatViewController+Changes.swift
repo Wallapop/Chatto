@@ -49,13 +49,14 @@ extension BaseChatViewController {
         }
 
         self.updateQueue.addTask({ [weak self] (runNextTask) -> Void in
-            guard let sSelf = self else { return }
+            guard let self else { return }
 
-            let oldItems = sSelf.chatItemCompanionCollection
-            sSelf.updateModels(newItems: newItems, oldItems: oldItems, updateType: updateType, completion: {
-                guard let sSelf = self else { return }
-                if sSelf.updateQueue.isEmpty {
-                    sSelf.enqueueMessageCountReductionIfNeeded()
+            let oldItems = self.chatItemCompanionCollection
+            self.updateModels(newItems: newItems, oldItems: oldItems, updateType: updateType, completion: {
+                [weak self] in
+                guard let self else { return }
+                if self.updateQueue.isEmpty {
+                    self.enqueueMessageCountReductionIfNeeded()
                 }
                 completion?()
                 DispatchQueue.main.async(execute: { () -> Void in
@@ -266,8 +267,8 @@ extension BaseChatViewController {
             })
         }
 
-        let createModelUpdate = {
-            return self.createModelUpdates(
+        let createModelUpdate = { [weak self] in
+            return self?.createModelUpdates(
                 newItems: newItems,
                 oldItems: oldItems,
                 collectionViewWidth: collectionViewWidth)
@@ -275,13 +276,13 @@ extension BaseChatViewController {
 
         if performInBackground {
             DispatchQueue.global(qos: .userInitiated).async { () -> Void in
-                let modelUpdate = createModelUpdate()
+                guard let modelUpdate = createModelUpdate() else { return }
                 DispatchQueue.main.async(execute: { () -> Void in
                     perfomBatchUpdates(modelUpdate.changes, modelUpdate.updateModelClosure)
                 })
             }
         } else {
-            let modelUpdate = createModelUpdate()
+            guard let modelUpdate = createModelUpdate() else { return }
             perfomBatchUpdates(modelUpdate.changes, modelUpdate.updateModelClosure)
         }
     }
