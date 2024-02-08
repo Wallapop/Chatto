@@ -42,8 +42,6 @@ private struct HashableItem: Hashable {
 extension BaseChatViewController {
 
     public func enqueueModelUpdate(updateType: UpdateType, completion: (() -> Void)? = nil) {
-        let newItems = self.chatDataSource?.chatItems ?? []
-
         if self.updatesConfig.coalesceUpdates {
             self.updateQueue.flushQueue()
         }
@@ -52,6 +50,7 @@ extension BaseChatViewController {
             guard let self else { return }
 
             let oldItems = self.chatItemCompanionCollection
+            let newItems = self.chatDataSource?.chatItems ?? []
             self.updateModels(newItems: newItems, oldItems: oldItems, updateType: updateType, completion: {
                 [weak self] in
                 guard let self else { return }
