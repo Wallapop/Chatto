@@ -23,6 +23,8 @@
  */
 
 import Chatto
+import UIKit
+import Foundation
 
 @objc
 public class ExpandableChatInputBarPresenter: NSObject, ChatInputBarPresenter {
